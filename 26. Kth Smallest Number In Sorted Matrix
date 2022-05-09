@@ -1,0 +1,56 @@
+clarification：给了一个sorted ascending matrix ⇒ n * n, 所以k一定是 1 <= k <= n^2
+	从左往右，从上往下都比前一个大 ⇒ 左上角(0,0)位置一定是最小的,从那开始expand
+	每个点expand另外两个点, 如果被visited过,就mark一下,防止走重复的
+ 
+solution:
+initial Heap and boolean[ ][ ] with position (0,0)
+do the following k -1 times
+poll out the top of heap = ''top''
+if (row + 1, col) not visited and in the bound, offer it to the heap
+ if (row , col + 1) not visited and in the bound, offer it to the heap
+reeturn top of heap
+ 
+ public int kthSmallest(int[][] matrix, int k) {
+   int rows = matrix.length;
+   int cols = matrix[0].length;
+   PriorityQueue<Cell> minHeap = new PriorityQueue<Cell>( new Comparator<Cell>(){
+     @Override
+     public int compare(Cell c1, Cell c2){
+       if (c1.value == c2.value) return 0;
+        return c1.value < c2.value ? -1 : 1;
+     }
+   });
+   boolean[][] visited = new boolean[rows][cols];
+   //initial
+   minHeap.offer(new Cell(0, 0, matrix[0][0]));
+   visited[0][0] = true;
+ 
+   //expand
+   for (int i = 0; i < k - 1; i++){
+     Cell cur = minHeap.poll();
+ 
+     //generate
+	//b
+     if (cur.row + 1 < rows && !visited[cur.row + 1][cur.col]){
+       minHeap.offer(new Cell(cur.row + 1, cur.col,matrix[cur.row + 1][cur.col]));
+       visited[cur.row + 1][cur.col] = true;
+     }
+	//c
+      if (cur.col + 1 < cols && !visited[cur.row][cur.col + 1]){
+       minHeap.offer(new Cell(cur.row, cur.col + 1, matrix[cur.row][cur.col + 1]));
+       visited[cur.row][cur.col + 1] = true;
+     }
+ 
+   }
+   return minHeap.peek().value;
+ }
+ static class Cell{
+   int row, col, value;
+  
+   Cell(int row, int col, int value){
+     this.row = row;
+     this.col = col;
+     this.value = value;
+   }
+ }
+
